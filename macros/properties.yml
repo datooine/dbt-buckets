@@ -1,0 +1,74 @@
+version: 2
+
+macros:
+  - name: bucket_map
+    description: >
+      Build a deterministic mapping from raw categories to a limited set of
+      human-friendly buckets (e.g., Top-K or Pareto 80% + OTHER). This macro
+      ranks categories (by frequency by default, or by a user-provided metric
+      aggregation via `rank_by_metric`) and assigns each raw category either to
+      its own bucket or to the pooled `OTHER` bucket. The result is a tidy table
+      you can reuse to label any dataset consistently (via a join), drive
+      dashboards, or feed downstream statistical tests.
+
+      **Output (one row per raw category):**
+      - `category_raw` (STRING): normalized category value from `category_expr`.
+      - `row_count` (INT64): number of rows in this category.
+      - `row_share` (FLOAT64): `row_count / total_rows`.
+      - `cum_row_share` (FLOAT64): cumulative share by rank (descending).
+      - `metric_value` (FLOAT64): ranking metric value; if `rank_by_metric` is null, equals `row_count`.
+      - `metric_share` (FLOAT64): `metric_value / sum(metric_value)`; if ranking by frequency, equals `row_share`.
+      - `category_rank` (INT64): rank starting at 1; the pooled `OTHER` bucket is always rank `num_buckets`.
+      - `bucket` (STRING): final bucket label (either the raw category or `OTHER`).
+      - `kept` (BOOL): TRUE if preserved as its own bucket; FALSE if pooled into `OTHER`.
+      - `pinned` (BOOL): TRUE if retained due to `pins`.
+      - `num_buckets` (INT64): total visible buckets (kept + OTHER). OTHER’s rank = `num_buckets`.
+      - `policy` (STRING): effective policy (`pareto`, `top_k`, or `min_threshold`).
+      - `policy_params` (JSON/STRING): serialized parameters (coverage, k, min_share, min_categories, other_label).
+      - `params_hash` (STRING): stable hash of key inputs for reproducibility.
+      - `generated_at` (TIMESTAMP): creation time of this mapping.
+
+      **Notes:**
+      - Filtering, time windows, and segmentation are intentionally out of scope:
+        pass a pre-filtered relation to keep the macro composable.
+      - Determinism: ties are broken by `tiebreaker` (`alpha` or `version`) so
+        the same input produces the same bucket assignment.
+    arguments:
+      - name: relation
+        type: relation | sql
+        description: Pre-filtered input relation to analyze (CTE or table/view).
+      - name: category_expr
+        type: sql
+        description: SQL expression yielding the raw category (e.g., LOWER(channel)).
+      - name: policy
+        type: string
+        description: One of 'pareto' | 'top_k' | 'min_threshold'. Default 'pareto'.
+      - name: coverage
+        type: float
+        description: Pareto coverage threshold (0–1). Used when policy='pareto'. Default 0.80.
+      - name: k
+        type: integer
+        description: Number of categories to keep when policy='top_k'. Optional.
+      - name: min_share
+        type: float
+        description: Minimum row-share (0–1) when policy='min_threshold'. Default 0.05.
+      - name: pins
+        type: array<string>
+        description: Raw category values to always keep as their own bucket.
+      - name: min_categories
+        type: integer
+        description: Minimum number of buckets to keep (kept + OTHER). Ensures width; default 3.
+      - name: other_label
+        type: string
+        description: Label used for the pooled bucket. Default 'OTHER'.
+      - name: tiebreaker
+        type: string
+        description: >
+          Tie resolution: 'alpha' (lexicographic) or 'version' (natural/semver-like). Default 'alpha'.
+      - name: rank_by_metric
+        type: sql | null
+        description: >
+          If null, categories are ranked by frequency (COUNT(*)). If provided,
+          this must be a complete SQL aggregation (e.g., SUM(sales),
+          AVG(revenue_per_user), COUNTIF(is_converted)) used for ranking and for
+          `metric_value`/`metric_share`.

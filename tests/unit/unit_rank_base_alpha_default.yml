@@ -1,0 +1,26 @@
+unit_tests:
+  - name: unit_macro_rank_base_alpha_default
+    description: "rank_base alpha tiebreaker with default (count) metric"
+    model: macro_rank_base_alpha_default
+    given:
+      - input: ref('macro_rank_base_data')
+        rows:
+          - { category: 'A' }
+          - { category: 'A' }
+          - { category: 'B' }
+          - { category: 'B' }
+          - { category: 'C' }
+          - { category: 'C' }
+          - { category: '10' }
+          - { category: '2' }
+          - { category: 'v1.2' }
+          - { category: 'v1.10' }
+    expect:
+      rows:
+        - { category_raw: 'A', row_count: 2, row_share: 0.2, cum_row_share: 0.2, metric_value: 2, metric_share: 0.2, cum_metric_share: 0.2, category_rank: 1, total_rows: 10, total_metric_value: 10, total_categories: 7 }
+        - { category_raw: 'B', row_count: 2, row_share: 0.2, cum_row_share: 0.4, metric_value: 2, metric_share: 0.2, cum_metric_share: 0.4, category_rank: 2, total_rows: 10, total_metric_value: 10, total_categories: 7 }
+        - { category_raw: 'C', row_count: 2, row_share: 0.2, cum_row_share: 0.6, metric_value: 2, metric_share: 0.2, cum_metric_share: 0.6, category_rank: 3, total_rows: 10, total_metric_value: 10, total_categories: 7 }
+        - { category_raw: '10', row_count: 1, row_share: 0.1, cum_row_share: 0.7, metric_value: 1, metric_share: 0.1, cum_metric_share: 0.7, category_rank: 4, total_rows: 10, total_metric_value: 10, total_categories: 7 }
+        - { category_raw: '2', row_count: 1, row_share: 0.1, cum_row_share: 0.8, metric_value: 1, metric_share: 0.1, cum_metric_share: 0.8, category_rank: 5, total_rows: 10, total_metric_value: 10, total_categories: 7 }
+        - { category_raw: 'v1.10', row_count: 1, row_share: 0.1, cum_row_share: 0.9, metric_value: 1, metric_share: 0.1, cum_metric_share: 0.9, category_rank: 6, total_rows: 10, total_metric_value: 10, total_categories: 7 }
+        - { category_raw: 'v1.2', row_count: 1, row_share: 0.1, cum_row_share: 1.0, metric_value: 1, metric_share: 0.1, cum_metric_share: 1.0, category_rank: 7, total_rows: 10, total_metric_value: 10, total_categories: 7 }

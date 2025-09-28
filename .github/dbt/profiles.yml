@@ -1,0 +1,11 @@
+dbt_buckets:
+  target: ci
+  outputs:
+    ci:
+      type: bigquery
+      method: service-account
+      keyfile: /tmp/fake-service-account.json
+      project: bigquery-sandbox-cpvuft6h
+      dataset: dbt_unit_tests
+      location: US
+      threads: 4

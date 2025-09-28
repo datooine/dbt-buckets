@@ -27,10 +27,10 @@ macros:
         description: Raw category values to always keep as their own bucket.
       - name: min_categories
         type: integer
-        description: Minimum number of buckets to keep (kept + OTHER). Ensures width; default 3.
+        description: Minimum number of buckets to keep (kept + `__other__`). Ensures width; default 3.
       - name: other_label
         type: string
-        description: Label used for the pooled bucket. Default 'OTHER'.
+        description: Label used for the pooled bucket. Default '__other__'.
       - name: tiebreaker
         type: string
         description: >

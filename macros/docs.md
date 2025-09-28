@@ -4,10 +4,10 @@ Blah, blah, blah
 
 {% docs bucket_map %}
 Build a deterministic mapping from raw categories to a limited set of
-human-friendly buckets (e.g., Top-K or Pareto 80% + OTHER). This macro
+human-friendly buckets (e.g., Top-K or Pareto 80% + `__other__`). This macro
 ranks categories (by frequency by default, or by a user-provided metric
 aggregation via `rank_by_metric`) and assigns each raw category either to
-its own bucket or to the pooled `OTHER` bucket. The result is a tidy table
+its own bucket or to the pooled `__other__` bucket (default label). The result is a tidy table
 you can reuse to label any dataset consistently (via a join), drive
 dashboards, or feed downstream statistical tests.
 
@@ -18,11 +18,11 @@ dashboards, or feed downstream statistical tests.
 - `cum_row_share` (FLOAT64): cumulative share by rank (descending).
 - `metric_value` (FLOAT64): ranking metric value; if `rank_by_metric` is null, equals `row_count`.
 - `metric_share` (FLOAT64): `metric_value / sum(metric_value)`; if ranking by frequency, equals `row_share`.
-- `category_rank` (INT64): rank starting at 1; the pooled `OTHER` bucket is always rank `num_buckets`.
-- `bucket` (STRING): final bucket label (either the raw category or `OTHER`).
-- `kept` (BOOL): TRUE if preserved as its own bucket; FALSE if pooled into `OTHER`.
+- `category_rank` (INT64): rank starting at 1; the pooled `__other__` bucket (default label) is always rank `num_buckets`.
+- `bucket` (STRING): final bucket label (either the raw category or `__other__`).
+- `kept` (BOOL): TRUE if preserved as its own bucket; FALSE if pooled into `__other__`.
 - `pinned` (BOOL): TRUE if retained due to `pins`.
-- `num_buckets` (INT64): total visible buckets (kept + OTHER). OTHER’s rank = `num_buckets`.
+- `num_buckets` (INT64): total visible buckets (kept + `__other__`). `__other__`’s rank = `num_buckets`.
 - `policy` (STRING): effective policy (`pareto`, `top_k`, or `min_threshold`).
 - `policy_params` (JSON/STRING): serialized parameters (coverage, k, min_share, min_categories, other_label).
 - `params_hash` (STRING): stable hash of key inputs for reproducibility.
@@ -47,4 +47,3 @@ arguments, and output details.
 Do not call directly. Refer to the documentation for the public macro `bucket_map` for usage,
 arguments, and output details.
 {% enddocs %}
-

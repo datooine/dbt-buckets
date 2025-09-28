@@ -10,7 +10,7 @@
     min_share=0.05,
     pins=[],
     min_categories=3,
-    other_label='__OTHER',
+    other_label='__other__',
     tiebreaker='alpha',
     rank_by_metric=None
 ) %}
@@ -25,8 +25,7 @@
       min_categories=min_categories,
       other_label=other_label,
       tiebreaker=tiebreaker,
-      rank_by_metric=rank_by_metric,
-      metric_agg=metric_agg
+      rank_by_metric=rank_by_metric
   )) }}
 {% endmacro %}
 
@@ -39,10 +38,9 @@
     min_share=0.05,
     pins=[],
     min_categories=3,
-    other_label='OTHER',
+    other_label='__other__',
     tiebreaker='alpha',
-    rank_by_metric=None,
-    metric_agg='sum'
+    rank_by_metric=None
 ) %}
   {{ exceptions.raise_compiler_error("dbt_buckets: bucket_map not implemented for adapter '{{ target.type }}'. Supported: bigquery.") }}
 {% endmacro %}

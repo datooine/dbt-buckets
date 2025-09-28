@@ -1,0 +1,26 @@
+unit_tests:
+  - name: unit_macro_bucket_map_pareto
+    description: "bucket_map pareto policy keeps top categories until coverage"
+    model: ref('macro_bucket_map_pareto')
+    given:
+      - input: ref('macro_rank_base_data')
+        rows:
+          - { category: 'A' }
+          - { category: 'A' }
+          - { category: 'B' }
+          - { category: 'B' }
+          - { category: 'C' }
+          - { category: 'C' }
+          - { category: '10' }
+          - { category: '2' }
+          - { category: 'v1.2' }
+          - { category: 'v1.10' }
+    expect:
+      rows:
+        - { category_raw: 'A', row_count: 2, metric_value: 2, bucket: 'A', kept: true, pinned: false, num_buckets: 6, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":[],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: 'BD4005BD3DDFF02EC98CDAE0FAC7C766' }
+        - { category_raw: 'B', row_count: 2, metric_value: 2, bucket: 'B', kept: true, pinned: false, num_buckets: 6, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":[],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: 'BD4005BD3DDFF02EC98CDAE0FAC7C766' }
+        - { category_raw: 'C', row_count: 2, metric_value: 2, bucket: 'C', kept: true, pinned: false, num_buckets: 6, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":[],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: 'BD4005BD3DDFF02EC98CDAE0FAC7C766' }
+        - { category_raw: '10', row_count: 1, metric_value: 1, bucket: '10', kept: true, pinned: false, num_buckets: 6, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":[],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: 'BD4005BD3DDFF02EC98CDAE0FAC7C766' }
+        - { category_raw: '2', row_count: 1, metric_value: 1, bucket: '2', kept: true, pinned: false, num_buckets: 6, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":[],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: 'BD4005BD3DDFF02EC98CDAE0FAC7C766' }
+        - { category_raw: 'v1.10', row_count: 1, metric_value: 1, bucket: '__other__', kept: false, pinned: false, num_buckets: 6, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":[],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: 'BD4005BD3DDFF02EC98CDAE0FAC7C766' }
+        - { category_raw: 'v1.2', row_count: 1, metric_value: 1, bucket: '__other__', kept: false, pinned: false, num_buckets: 6, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":[],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: 'BD4005BD3DDFF02EC98CDAE0FAC7C766' }

@@ -1,0 +1,58 @@
+unit_tests:
+  - name: unit_macro_apply_bucket_map_basic
+    description: "apply_bucket_map joins mapping metadata onto each source row"
+    model: macro_apply_bucket_map_basic
+    given:
+      - input: ref('macro_rank_base_data')
+        rows:
+          - { category: 'A' }
+          - { category: 'A' }
+          - { category: 'B' }
+          - { category: 'B' }
+          - { category: 'C' }
+          - { category: 'C' }
+          - { category: '10' }
+          - { category: '2' }
+          - { category: 'v1.2' }
+          - { category: 'v1.10' }
+    expect:
+      rows:
+        - { category: 'A', bucket: 'A', kept: true, pinned: false }
+        - { category: 'A', bucket: 'A', kept: true, pinned: false }
+        - { category: 'B', bucket: 'B', kept: true, pinned: false }
+        - { category: 'B', bucket: 'B', kept: true, pinned: false }
+        - { category: 'C', bucket: 'C', kept: true, pinned: false }
+        - { category: 'C', bucket: 'C', kept: true, pinned: false }
+        - { category: '10', bucket: '10', kept: true, pinned: false }
+        - { category: '2', bucket: '2', kept: true, pinned: false }
+        - { category: 'v1.2', bucket: '__other__', kept: false, pinned: false }
+        - { category: 'v1.10', bucket: '__other__', kept: false, pinned: false }
+
+  - name: unit_macro_apply_bucket_map_drift
+    description: "apply_bucket_map falls back to other_label when map lacks category"
+    model: macro_apply_bucket_map_drift
+    given:
+      - input: ref('macro_rank_base_data')
+        rows:
+          - { category: 'A' }
+          - { category: 'A' }
+          - { category: 'B' }
+          - { category: 'B' }
+          - { category: 'C' }
+          - { category: 'C' }
+          - { category: '10' }
+          - { category: '2' }
+          - { category: 'v1.2' }
+          - { category: 'v1.10' }
+    expect:
+      rows:
+        - { category: 'A', bucket: 'A' }
+        - { category: 'A', bucket: 'A' }
+        - { category: 'B', bucket: 'B' }
+        - { category: 'B', bucket: 'B' }
+        - { category: 'C', bucket: 'C' }
+        - { category: 'C', bucket: 'C' }
+        - { category: '10', bucket: '10' }
+        - { category: '2', bucket: '__other__' }
+        - { category: 'v1.2', bucket: '__other__' }
+        - { category: 'v1.10', bucket: '__other__' }

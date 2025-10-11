@@ -47,3 +47,41 @@ arguments, and output details.
 Do not call directly. Refer to the documentation for the public macro `bucket_map` for usage,
 arguments, and output details.
 {% enddocs %}
+
+{% docs apply_bucket_map %}
+Join a bucket mapping onto a source relation so each row receives a bucket label
+based on the category mapping produced by `bucket_map`.
+
+**Arguments:**
+- `relation` (relation | sql): source relation whose rows you want to label.
+- `category_expr` (sql): column name in `relation` representing the raw category
+  (compute a derived column beforehand if further normalization is needed).
+- `bucket_map_relation` (relation | sql): relation produced by `bucket_map` (must
+  include the `category_raw` column and desired bucket/metadata columns).
+- `bucket_field` (string, default `bucket`): column in the map to use for the
+  bucket label.
+- `category_key` (string, default `category_raw`): column in the map holding the
+  normalized category used for the join.
+- `passthrough_columns` (array<string>, default `[]`): additional columns from
+  the map to project alongside the bucket label (e.g., `kept`, `pinned`).
+- `other_label` (string, default `__other__`): fallback bucket when the category
+  does not exist in the map (helps cover drift/new categories).
+
+**Output columns:**
+The macro returns all columns from `relation` plus:
+- `bucket_field` (or its alias if renamed by the caller).
+- Any columns listed in `passthrough_columns`.
+
+This macro performs a `LEFT JOIN` so unmapped categories remain present.
+Use `other_label` to ensure they land in a predictable catch-all bucket.
+{% enddocs %}
+
+{% docs bigquery__apply_bucket_map %}
+BigQuery implementation of `apply_bucket_map`. See `apply_bucket_map` docs for
+usage details.
+{% enddocs %}
+
+{% docs default__apply_bucket_map %}
+Default fallback implementation of `apply_bucket_map`. Raises an error unless an
+adapter-specific implementation is available.
+{% enddocs %}

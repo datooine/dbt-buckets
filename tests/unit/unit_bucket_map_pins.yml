@@ -1,7 +1,7 @@
 unit_tests:
   - name: unit_macro_bucket_map_pins
     description: "bucket_map pins force categories to stay separate even below thresholds"
-    model: ref('macro_bucket_map_pins')
+    model: macro_bucket_map_pins
     given:
       - input: ref('macro_rank_base_data')
         rows:
@@ -17,10 +17,10 @@ unit_tests:
           - { category: 'v1.10' }
     expect:
       rows:
-        - { category_raw: 'A', row_count: 2, metric_value: 2, bucket: 'A', kept: true, pinned: false, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: '9BE4EB3F56607735FF7D350C4F000FCB' }
-        - { category_raw: 'B', row_count: 2, metric_value: 2, bucket: 'B', kept: true, pinned: false, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: '9BE4EB3F56607735FF7D350C4F000FCB' }
-        - { category_raw: 'C', row_count: 2, metric_value: 2, bucket: 'C', kept: true, pinned: false, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: '9BE4EB3F56607735FF7D350C4F000FCB' }
-        - { category_raw: '10', row_count: 1, metric_value: 1, bucket: '10', kept: true, pinned: false, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: '9BE4EB3F56607735FF7D350C4F000FCB' }
-        - { category_raw: '2', row_count: 1, metric_value: 1, bucket: '2', kept: true, pinned: true, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: '9BE4EB3F56607735FF7D350C4F000FCB' }
-        - { category_raw: 'v1.10', row_count: 1, metric_value: 1, bucket: 'v1.10', kept: true, pinned: true, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: '9BE4EB3F56607735FF7D350C4F000FCB' }
-        - { category_raw: 'v1.2', row_count: 1, metric_value: 1, bucket: '__other__', kept: false, pinned: false, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}', params_hash: '9BE4EB3F56607735FF7D350C4F000FCB' }
+        - { category_raw: 'A', row_count: 2, metric_value: 2, bucket: 'A', kept: true, pinned: false, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}' }
+        - { category_raw: 'B', row_count: 2, metric_value: 2, bucket: 'B', kept: true, pinned: false, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}' }
+        - { category_raw: 'C', row_count: 2, metric_value: 2, bucket: 'C', kept: true, pinned: false, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}' }
+        - { category_raw: '10', row_count: 1, metric_value: 1, bucket: '10', kept: true, pinned: false, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}' }
+        - { category_raw: '2', row_count: 1, metric_value: 1, bucket: '2', kept: true, pinned: true, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}' }
+        - { category_raw: 'v1.10', row_count: 1, metric_value: 1, bucket: 'v1.10', kept: true, pinned: true, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}' }
+        - { category_raw: 'v1.2', row_count: 1, metric_value: 1, bucket: '__other__', kept: false, pinned: false, num_buckets: 7, policy: 'pareto', policy_params: '{"coverage":0.8,"k":null,"min_share":0.05,"min_categories":3,"other_label":"__other__","pins":["2","v1.10"],"tiebreaker":"alpha","metric_expression":"COUNT(*)"}' }

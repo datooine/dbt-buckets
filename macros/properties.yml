@@ -48,3 +48,34 @@ macros:
 
   - name: default__bucket_map
     description: '{{ doc("default__bucket_map") }}'
+
+  - name: apply_bucket_map
+    description: '{{ doc("apply_bucket_map") }}'
+    arguments:
+      - name: relation
+        type: relation | sql
+        description: Source relation whose rows should be bucket-labelled.
+      - name: category_expr
+        type: sql
+        description: Expression pointing to the raw category in `relation`.
+      - name: bucket_map_relation
+        type: relation | sql
+        description: Mapping relation produced by `bucket_map`.
+      - name: bucket_field
+        type: string
+        description: Column in the map to use as the bucket label. Default 'bucket'.
+      - name: category_key
+        type: string
+        description: Column in the map holding the normalized category. Default 'category_raw'.
+      - name: passthrough_columns
+        type: array<string>
+        description: Additional map columns to project, e.g. ['kept', 'pinned'].
+      - name: other_label
+        type: string
+        description: Fallback bucket label when a category is missing. Default '__other__'.
+
+  - name: bigquery__apply_bucket_map
+    description: '{{ doc("bigquery__apply_bucket_map") }}'
+
+  - name: default__apply_bucket_map
+    description: '{{ doc("default__apply_bucket_map") }}'

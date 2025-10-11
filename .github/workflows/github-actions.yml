@@ -10,7 +10,8 @@ jobs:
   compile:
     runs-on: ubuntu-latest
     env:
-      DBT_PROFILES_DIR: .github/dbt
+      DBT_PROFILES_DIR: ${{ runner.temp }}/dbt-profiles
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/bq-key.json
 
     steps:
       - uses: actions/checkout@v4
@@ -25,26 +26,26 @@ jobs:
       - name: Sync dependencies
         run: uv sync --dev
 
-      - name: Prepare dbt profile
+      - name: Prepare dbt profile and credentials
         run: |
-          mkdir -p $DBT_PROFILES_DIR
-          cat <<'PROFILE' > $DBT_PROFILES_DIR/profiles.yml
+          mkdir -p "$DBT_PROFILES_DIR"
+          cat <<'PROFILE' > "$DBT_PROFILES_DIR/profiles.yml"
           dbt_buckets:
             target: ci
             outputs:
               ci:
                 type: bigquery
                 method: service-account
-                keyfile: /tmp/fake-service-account.json
+                keyfile: "$GOOGLE_APPLICATION_CREDENTIALS"
                 project: bigquery-sandbox-cpvuft6h
                 dataset: dbt_unit_tests
                 location: EU
                 threads: 1
           PROFILE
-          echo '{}' > /tmp/fake-service-account.json
+          echo '${{ secrets.BQ_SERVICE_ACCOUNT_JSON }}' > "$GOOGLE_APPLICATION_CREDENTIALS"
 
       - name: dbt deps
-        run: uv run dbt deps
+        run: uv run python -m dbt.cli.main deps
 
       - name: dbt compile
-        run: uv run dbt compile
+        run: uv run python -m dbt.cli.main compile

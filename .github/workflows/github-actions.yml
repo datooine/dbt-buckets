@@ -9,9 +9,6 @@ on:
 jobs:
   compile:
     runs-on: ubuntu-latest
-    env:
-      DBT_PROFILES_DIR: ${{ runner.temp }}/dbt-profiles
-      GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/bq-key.json
 
     steps:
       - uses: actions/checkout@v4
@@ -24,12 +21,23 @@ jobs:
         run: pip install uv
 
       - name: Sync dependencies
-        run: uv sync --dev
+        run: uv sync --extra dev
+
+      - name: Configure dbt environment variables
+        run: |
+          echo "DBT_PROFILES_DIR=$RUNNER_TEMP/dbt-profiles" >> "$GITHUB_ENV"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/bq-key.json" >> "$GITHUB_ENV"
 
       - name: Prepare dbt profile and credentials
+        env:
+          BQ_SERVICE_ACCOUNT_JSON_BASE64: ${{ secrets.BQ_SERVICE_ACCOUNT_JSON_BASE64 }}
         run: |
+          set -euo pipefail
+
           mkdir -p "$DBT_PROFILES_DIR"
-          cat <<'PROFILE' > "$DBT_PROFILES_DIR/profiles.yml"
+          mkdir -p "$(dirname "$GOOGLE_APPLICATION_CREDENTIALS")"
+
+          cat <<PROFILE > "$DBT_PROFILES_DIR/profiles.yml"
           dbt_buckets:
             target: ci
             outputs:
@@ -42,10 +50,19 @@ jobs:
                 location: EU
                 threads: 1
           PROFILE
-          echo '${{ secrets.BQ_SERVICE_ACCOUNT_JSON }}' > "$GOOGLE_APPLICATION_CREDENTIALS"
+          if [ -z "${BQ_SERVICE_ACCOUNT_JSON_BASE64:-}" ]; then
+            echo "BQ_SERVICE_ACCOUNT_JSON_BASE64 secret is empty" >&2
+            exit 1
+          fi
+
+          echo "Loaded service account key (base64) length: ${#BQ_SERVICE_ACCOUNT_JSON_BASE64}"
+          printf '%s' "$BQ_SERVICE_ACCOUNT_JSON_BASE64" | base64 --decode > "$GOOGLE_APPLICATION_CREDENTIALS"
+          echo "Rendered dbt profile (for debugging):"
+          cat "$DBT_PROFILES_DIR/profiles.yml"
+          echo "Service account key bytes: $(wc -c < "$GOOGLE_APPLICATION_CREDENTIALS")"
 
       - name: dbt deps
-        run: uv run python -m dbt.cli.main deps
+        run: uv run --extra dev python -m dbt.cli.main deps
 
       - name: dbt compile
-        run: uv run python -m dbt.cli.main compile
+        run: uv run --extra dev python -m dbt.cli.main compile

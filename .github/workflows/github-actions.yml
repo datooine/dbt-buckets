@@ -46,7 +46,7 @@ jobs:
                 method: service-account
                 keyfile: "$GOOGLE_APPLICATION_CREDENTIALS"
                 project: bigquery-sandbox-cpvuft6h
-                dataset: dbt_unit_tests
+                dataset: tmp
                 location: EU
                 threads: 1
           PROFILE
@@ -62,7 +62,10 @@ jobs:
           echo "Service account key bytes: $(wc -c < "$GOOGLE_APPLICATION_CREDENTIALS")"
 
       - name: dbt deps
-        run: uv run --extra dev python -m dbt.cli.main deps
+        run: uv run --extra dev dbt deps
 
       - name: dbt compile
-        run: uv run --extra dev python -m dbt.cli.main compile
+        run: uv run --extra dev dbt compile
+
+      - name: dbt unit tests
+        run: uv run --extra dev ./scripts/run_unit_tests.sh

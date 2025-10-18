@@ -12,21 +12,24 @@
     min_categories=3,
     other_label='__other__',
     tiebreaker='alpha',
-    rank_by_metric=None
+    rank_by_metric=None,
+    indent=0
 ) %}
-  {{ return(adapter.dispatch('bucket_map', 'dbt_buckets')(
-      relation=relation,
-      category_expr=category_expr,
-      policy=policy,
-      coverage=coverage,
-      k=k,
-      min_share=min_share,
-      pins=pins,
-      min_categories=min_categories,
-      other_label=other_label,
-      tiebreaker=tiebreaker,
-      rank_by_metric=rank_by_metric
-  )) }}
+  {{ return(
+      adapter.dispatch('bucket_map', 'dbt_buckets')(
+          relation=relation,
+          category_expr=category_expr,
+          policy=policy,
+          coverage=coverage,
+          k=k,
+          min_share=min_share,
+          pins=pins,
+          min_categories=min_categories,
+          other_label=other_label,
+          tiebreaker=tiebreaker,
+          rank_by_metric=rank_by_metric
+      ) | indent(indent | int, True)
+  ) }}
 {% endmacro %}
 
 {% macro default__bucket_map(
@@ -40,7 +43,8 @@
     min_categories=3,
     other_label='__other__',
     tiebreaker='alpha',
-    rank_by_metric=None
+    rank_by_metric=None,
+    indent=0
 ) %}
   {{ exceptions.raise_compiler_error("dbt_buckets: bucket_map not implemented for adapter '{{ target.type }}'. Supported: bigquery.") }}
 {% endmacro %}

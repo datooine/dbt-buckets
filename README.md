@@ -4,7 +4,7 @@
 
 Analysts and engineers often need to collapse long categorical tails into a
 handful of buckets so models stay robust and interpretable. Typical solutions
-involve bespoke queries or exporting the data to spreadsheets, which fragments
+involve bespoke queries or exporting the data elsewhere, which fragments
 the workflow outside your warehouse. **dbt-buckets** keeps the entire
 categorisation process in SQL: reuse the same macros across projects, stay
 deterministic, and keep outputs tightly integrated with your dbt models.

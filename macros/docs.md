@@ -1,5 +1,45 @@
 {% docs __dbt_buckets__ %}
-Blah, blah, blah
+## dbt-buckets – Bucketing Categories in SQL
+
+### Why this project exists
+
+Analysts and engineers often need to collapse long categorical tails into a
+handful of buckets so models stay robust and interpretable. Typical solutions
+involve bespoke queries or exporting the data to spreadsheets, which fragments
+the workflow outside your warehouse. **dbt-buckets** keeps the entire
+categorisation process in SQL: reuse the same macros across projects, stay
+deterministic, and keep outputs tightly integrated with your dbt models.
+
+The macros in this project generate bucket mappings that you can apply to any
+relation. They are written for BigQuery today, but the public interface is kept
+generic so other adapters can be added later.
+
+#### Supported policies
+
+- **Pareto (`policy='pareto'`)** – keeps the smallest set of categories needed
+  to cover a desired share of the metric (`coverage`, default 80%). Think “top
+  X% plus other”. A `min_categories` backstop ensures you always expose a minimum
+  width even if the coverage is achieved quickly.
+- **Top-K (`policy='top_k'`)** – keeps exactly `k` categories (ties resolved via
+  `tiebreaker`) and sends the rest to `other`. Ideal when you already know how
+  many buckets you want or need consistency across segments.
+- **Minimum threshold (`policy='min_threshold'`)** – keeps any category whose
+  metric share is above `min_share`. Everything else falls into `other`, with an
+  optional `min_categories` safety net. Use this when you care about absolute
+  visibility (e.g., “show anything above 2%”).
+
+All policies honour `pins`, letting you force important categories to stay even
+if they would otherwise fall into the pooled bucket. The output arranges the
+categories by metric share (or custom metric), making the behaviour predictable
+across runs.
+
+#### Configurable ranking metrics
+
+By default the macros rank categories by volume (row count). Pass
+`rank_by_metric` to use any aggregation your warehouse supports: revenue sums,
+`COUNT(DISTINCT user_pseudo_id)`, conversion rate composites, etc. The chosen
+metric drives ordering, share calculations, and the policy decisions, while row
+count metadata is still retained for reference.
 {% enddocs %}
 
 {% docs bucket_map %}

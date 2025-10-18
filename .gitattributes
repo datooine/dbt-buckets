@@ -1,0 +1,9 @@
+# Highlight dbt SQL/Jinja assets as SQL so GitHub classifies the repo accordingly
+models/**/*.sql linguist-language=SQL
+seeds/**/*.sql   linguist-language=SQL
+macros/**/*.sql  linguist-language=SQL
+analyses/**/*.sql linguist-language=SQL
+
+# Keep shell helpers classified explicitly
+scripts/**/*.sh linguist-language=Shell
+*.sh             linguist-language=Shell

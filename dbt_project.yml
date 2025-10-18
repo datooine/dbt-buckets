@@ -3,7 +3,8 @@
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
 name: 'dbt_buckets'
-version: '1.0.0'
+version: '0.0.1'
+require-dbt-version: ['>=1.6.0', '<2.0.0']
 
 # This setting configures which "profile" dbt uses for this project.
 profile: 'dbt_buckets'
@@ -21,4 +22,3 @@ snapshot-paths: ["snapshots"]
 clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
-

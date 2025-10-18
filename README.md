@@ -13,6 +13,33 @@ The macros in this project generate bucket mappings that you can apply to any
 relation. They are written for BigQuery today, but the public interface is kept
 generic so other adapters can be added later.
 
+#### Installation
+
+Add this package to your `packages.yml` (or to the `packages` section of
+`dbt_project.yml`) and pull dependencies with `dbt deps`:
+
+```yaml
+packages:
+  - package: datooine/dbt-buckets
+    version: "~> 0.1"
+```
+
+```bash
+dbt deps
+```
+
+Once installed, call the macros through the `dbt_buckets` namespace:
+
+```jinja
+{{ dbt_buckets.bucket_map(
+    relation=ref('my_events'),
+    category_expr='COALESCE(channel, "Unknown")',
+    policy='pareto',
+    coverage=0.8,
+    min_categories=5
+) }}
+```
+
 #### Supported policies
 
 - **Pareto (`policy='pareto'`)** – keeps the smallest set of categories needed
@@ -109,9 +136,9 @@ Parameters:
 Example:
 
 ```jinja
-with brand_map as (
+with mobile_brand_map as (
   {{ dbt_buckets.bucket_map(
-      relation=ref('events'),
+      relation='`bigquery-public-data.ga4_obfuscated_sample_ecommerce.events_20210131`',
       category_expr='COALESCE(device.mobile_brand_name, "Unknown")',
       policy='pareto',
       coverage=0.8,
@@ -121,11 +148,13 @@ with brand_map as (
 select
   labeled.user_pseudo_id,
   labeled.bucket as mobile_brand_bucket
-from {{ dbt_buckets.apply_bucket_map(
-         relation=ref('events'),
-         category_expr='COALESCE(device.mobile_brand_name, "Unknown")',
-         bucket_map_relation='brand_map'
-     ) }} as labeled;
+from (
+  {{ dbt_buckets.apply_bucket_map(
+      relation='`bigquery-public-data.ga4_obfuscated_sample_ecommerce.events_20210131`',
+      category_expr='COALESCE(device.mobile_brand_name, "Unknown")',
+      bucket_map_relation=mobile_brand_map
+  ) }}
+) as labeled;
 ```
 
 Both macros return raw SQL strings, so you can materialise them as ephemeral

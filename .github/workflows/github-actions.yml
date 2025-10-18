@@ -156,6 +156,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Configure git user
+        env:
+          GIT_ACTOR: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+          NAME="${GIT_ACTOR:-github-actions[bot]}"
+          EMAIL="${NAME}@users.noreply.github.com"
+          git config user.name "$NAME"
+          gitconfigSignature="$EMAIL"
       - name: Extract project version
         id: version
         run: |

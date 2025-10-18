@@ -1,4 +1,4 @@
-name: dbt compile
+name: dbt checks
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  compile:
+  checks:
     runs-on: ubuntu-latest
 
     steps:
@@ -69,3 +69,77 @@ jobs:
 
       - name: dbt unit tests
         run: uv run --extra dev ./scripts/run_unit_tests.sh
+
+  docs:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.actor != 'nektos/act'
+    needs: checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Sync dependencies
+        run: uv sync --extra dev
+
+      - name: Configure dbt environment variables
+        run: |
+          echo "DBT_PROFILES_DIR=$RUNNER_TEMP/dbt-profiles" >> "$GITHUB_ENV"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/bq-key.json" >> "$GITHUB_ENV"
+
+      - name: Prepare dbt profile and credentials
+        env:
+          BQ_SERVICE_ACCOUNT_JSON_BASE64: ${{ secrets.BQ_SERVICE_ACCOUNT_JSON_BASE64 }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$DBT_PROFILES_DIR"
+          mkdir -p "$(dirname "$GOOGLE_APPLICATION_CREDENTIALS")"
+
+          cat <<PROFILE > "$DBT_PROFILES_DIR/profiles.yml"
+          dbt_buckets:
+            target: ci
+            outputs:
+              ci:
+                type: bigquery
+                method: service-account
+                keyfile: "$GOOGLE_APPLICATION_CREDENTIALS"
+                project: bigquery-sandbox-cpvuft6h
+                dataset: tmp
+                location: EU
+                threads: 1
+          PROFILE
+          if [ -z "${BQ_SERVICE_ACCOUNT_JSON_BASE64:-}" ]; then
+            echo "BQ_SERVICE_ACCOUNT_JSON_BASE64 secret is empty" >&2
+            exit 1
+          fi
+
+          printf '%s' "$BQ_SERVICE_ACCOUNT_JSON_BASE64" | base64 --decode > "$GOOGLE_APPLICATION_CREDENTIALS"
+
+      - name: Generate docs
+        run: |
+          uv run --extra dev dbt deps
+          uv run --extra dev dbt docs generate
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: target
+
+  deploy-docs:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.actor != 'nektos/act'
+    needs: docs
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

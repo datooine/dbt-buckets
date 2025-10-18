@@ -164,7 +164,7 @@ jobs:
           NAME="${GIT_ACTOR:-github-actions[bot]}"
           EMAIL="${NAME}@users.noreply.github.com"
           git config user.name "$NAME"
-          gitconfigSignature="$EMAIL"
+          git config user.email "$EMAIL"
       - name: Extract project version
         id: version
         run: |

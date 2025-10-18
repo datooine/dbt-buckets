@@ -111,7 +111,7 @@ from mobile_brand_map
 order by category_rank;
 ```
 
-![Pareto demo](docs/img/bucket_map_demo_output.png)
+![Pareto demo](docs/img/bucket_map_pareto_mobile_brand.png)
 
 This is the same query shipped in `analyses/bucket_map_pareto_mobile_brand.sql`,
 making it easy to visualise or screenshot the output as a demo.

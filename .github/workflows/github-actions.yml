@@ -169,7 +169,7 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          VERSION=$(grep -E '^version:' dbt_project.yml | head -n 1 | awk '{print $2}' | tr -d '"')
+          VERSION=$(grep -E '^version:' dbt_project.yml | head -n 1 | awk '{print $2}' | tr -d '"'\''')
           if [ -z "$VERSION" ]; then
             echo "Could not find version in dbt_project.yml" >&2
             exit 1

@@ -20,13 +20,16 @@ Add this package to your `packages.yml` (or to the `packages` section of
 
 ```yaml
 packages:
-  - package: datooine/dbt-buckets
-    version: "~> 0.1"
+  - package: datooine/dbt_buckets
+    version: [">=0.1.1", "<0.2.0"]
 ```
 
 ```bash
 dbt deps
 ```
+
+Version 0.1.1 supports dbt Core 1.6+ and dbt v2 (`>=1.6.0,<3.0.0`).
+SQL execution supports **BigQuery**.
 
 Once installed, call the macros through the `dbt_buckets` namespace:
 
@@ -176,29 +179,13 @@ BigQuery’s GA4 public dataset (`bigquery-public-data.ga4_obfuscated_sample_eco
 * `analyses/apply_bucket_map_demo.sql` – Stepwise example that applies three
   mappings back onto the events table to produce per-user bucket labels.
 
-Run any analysis with:
-
-```bash
-dbt compile --select analyses/<file>.sql
-``` 
-
-or open the compiled SQL in `target/compiled/analyses/` after compilation. Each
-file demonstrates how to pass parameters to the macros and how the resulting
-mapping behaves.
+Each file demonstrates how to pass parameters to the macros and how the resulting
+mapping behaves. See [Contributing](CONTRIBUTING.md) for instructions on running
+the example analyses locally.
 
 ---
 
-### Contributing & local development
+### Contributing
 
-```bash
-uv sync --extra dev   # install dbt + adapters
-uv run dbt compile    # smoke test the macros
-uv run ./scripts/run_unit_tests.sh
-```
-
-The unit tests exercise the macros using dbt-unit fixtures. The GitHub Actions
-workflow runs the same compile/tests for every PR and publishes the generated
-docs to GitHub Pages when changes land on `main`.
-
-Feel free to open an issue or PR if you want to add another adapter, policy, or
-consumption pattern.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, tests, dbt v1 and v2
+checks, documentation generation, and CI instructions.

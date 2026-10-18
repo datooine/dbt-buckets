@@ -1,0 +1,20 @@
+# Placeholder profiles for parsing and rendering SQL without warehouse access.
+dbt_buckets:
+  target: bigquery
+  outputs:
+    bigquery:
+      type: bigquery
+      method: oauth
+      project: dbt-buckets-compatibility
+      dataset: dbt_buckets
+      location: US
+      threads: 1
+    snowflake:
+      type: snowflake
+      account: placeholder
+      user: placeholder
+      password: placeholder
+      database: placeholder
+      schema: placeholder
+      warehouse: placeholder
+      threads: 1

@@ -5,10 +5,10 @@ macros:
     description: '{{ doc("bucket_map") }}'
     arguments:
       - name: relation
-        type: relation | sql
+        type: relation
         description: Pre-filtered input relation to analyze (CTE or table/view).
       - name: category_expr
-        type: sql
+        type: string
         description: SQL expression yielding the raw category (e.g., LOWER(channel)).
       - name: policy
         type: string
@@ -23,7 +23,7 @@ macros:
         type: float
         description: Minimum row-share (0–1) when policy='min_threshold'. Default 0.05.
       - name: pins
-        type: array<string>
+        type: list[string]
         description: Raw category values to always keep as their own bucket.
       - name: min_categories
         type: integer
@@ -36,12 +36,15 @@ macros:
         description: >
           Tie resolution: 'alpha' (lexicographic) or 'version' (natural/semver-like). Default 'alpha'.
       - name: rank_by_metric
-        type: sql | null
+        type: optional[string]
         description: >
           If null, categories are ranked by frequency (COUNT(*)). If provided,
           this must be a complete SQL aggregation (e.g., SUM(sales),
           AVG(revenue_per_user), COUNTIF(is_converted)) used for ranking and for
           `metric_value`/`metric_share`.
+      - name: indent
+        type: integer
+        description: Indent the rendered SQL when embedding in larger queries.
 
   - name: bigquery__bucket_map
     description: '{{ doc("bigquery__bucket_map") }}'
@@ -53,13 +56,13 @@ macros:
     description: '{{ doc("apply_bucket_map") }}'
     arguments:
       - name: relation
-        type: relation | sql
+        type: relation
         description: Source relation whose rows should be bucket-labelled.
       - name: category_expr
-        type: sql
+        type: string
         description: Expression pointing to the raw category in `relation`.
       - name: bucket_map_relation
-        type: relation | sql
+        type: relation
         description: Mapping relation produced by `bucket_map`.
       - name: bucket_field
         type: string
@@ -68,11 +71,14 @@ macros:
         type: string
         description: Column in the map holding the normalized category. Default 'category_raw'.
       - name: passthrough_columns
-        type: array<string>
+        type: list[string]
         description: Additional map columns to project, e.g. ['kept', 'pinned'].
       - name: other_label
         type: string
         description: Fallback bucket label when a category is missing. Default '__other__'.
+      - name: indent
+        type: integer
+        description: Indent the rendered SQL when embedding in larger queries.
 
   - name: bigquery__apply_bucket_map
     description: '{{ doc("bigquery__apply_bucket_map") }}'

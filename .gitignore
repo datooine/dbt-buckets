@@ -6,3 +6,4 @@ dbt_internal_packages/
 
 .vscode/
 .python-version
+.venv/

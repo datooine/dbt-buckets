@@ -18,5 +18,8 @@
     rank_by_metric=None,
     tiebreaker='alpha'
 ) %}
-  {# TODO: either raise a clear "not implemented" error or add a portable baseline #}
+  {% if execute %}
+    {{ exceptions.raise_compiler_error("dbt_buckets: rank_base not implemented for adapter '" ~ target.type ~ "'. Supported: bigquery.") }}
+  {% endif %}
+  {{ return('') }}
 {% endmacro %}

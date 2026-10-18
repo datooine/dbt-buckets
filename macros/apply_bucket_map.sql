@@ -31,5 +31,9 @@
     other_label='__other__',
     indent=0
 ) %}
-  {{ exceptions.raise_compiler_error("dbt_buckets: apply_bucket_map not implemented for adapter '{{ target.type }}'. Supported: bigquery.") }}
+  {# Allow parsing without claiming support for another adapter at execution. #}
+  {% if execute %}
+    {{ exceptions.raise_compiler_error("dbt_buckets: apply_bucket_map not implemented for adapter '" ~ target.type ~ "'. Supported: bigquery.") }}
+  {% endif %}
+  {{ return('') }}
 {% endmacro %}

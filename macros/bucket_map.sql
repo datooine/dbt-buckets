@@ -46,5 +46,9 @@
     rank_by_metric=None,
     indent=0
 ) %}
-  {{ exceptions.raise_compiler_error("dbt_buckets: bucket_map not implemented for adapter '{{ target.type }}'. Supported: bigquery.") }}
+  {# Package Hub parses with a placeholder adapter and execute=False. #}
+  {% if execute %}
+    {{ exceptions.raise_compiler_error("dbt_buckets: bucket_map not implemented for adapter '" ~ target.type ~ "'. Supported: bigquery.") }}
+  {% endif %}
+  {{ return('') }}
 {% endmacro %}

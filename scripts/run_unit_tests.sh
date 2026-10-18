@@ -14,6 +14,8 @@ if [[ "${1:-}" == "--help" ]]; then
 Usage: scripts/run_unit_tests.sh [additional dbt test args]
 
 Runs dbt unit tests defined under tests/unit/.
+Uses dbt's normal profile lookup. Set DBT_PROFILES_DIR or pass --profiles-dir
+to select another profile. CI supplies its service-account profile.
 Override dbt command with DBT_CMD, test selector with DBT_UNIT_TEST_SELECTOR,
 and pre-test run selector with DBT_UNIT_RUN_SELECTOR.
 Pass any extra flags (e.g. "-t dev") and they will be forwarded to both dbt run and test.
